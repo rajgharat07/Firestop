@@ -1,0 +1,11 @@
+httpx>=0.27,<0.29
+neo4j>=5.24,<7
+node-semver>=0.9,<0.10
+orjson>=3.10,<4
+pydantic>=2.9,<3
+pydantic-settings>=2.5,<3
+pyyaml>=6.0,<7
+typer>=0.12,<0.17
+rich>=13.7,<15
+fastapi>=0.115,<0.120
+uvicorn[standard]>=0.30,<0.40

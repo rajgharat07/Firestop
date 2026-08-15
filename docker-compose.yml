@@ -1,0 +1,144 @@
+name: firestop
+
+# MinIO rather than a local directory on purpose. The graph-indexer advances its
+# scope cursor with a conditional put, and the LocalFileSystem object-store
+# backend does not implement PutMode::Update -- so with CLOUD_PROVIDER=local the
+# node works but the indexer never publishes a traversal index. Firestop's blast
+# radius queries are multi-hop, so losing compiled CSC generations is not an
+# option.
+x-hydra-env: &hydra-env
+  CLOUD_PROVIDER: aws
+  AWS_BUCKET_NAME: ${HYDRADB_BUCKET:-firestop}
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_ENDPOINT: http://minio:9000
+  AWS_ALLOW_HTTP: "true"
+  AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-firestop}
+  AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-firestop-dev-secret}
+
+  GRAPH_NAMESPACE: ${HYDRADB_NAMESPACE:-firestop}
+  GRAPH_ID: ${HYDRADB_GRAPH_ID:-default}
+  GRAPH_CELL_ID: cell-0
+  GRAPH_CELLS: cell-0
+  GRAPH_DATA_PATH: data
+  GRAPH_DATA_CACHE_DIR: /var/lib/hydradb/cache
+  # 512 MiB. Larger caches read better but a long ingest on a laptop is bounded
+  # by host memory long before it is bounded by object-store round trips.
+  GRAPH_DATA_CACHE_BYTES: "536870912"
+  GRAPH_AUTH_TOKEN_FILE: /var/lib/hydradb/auth-token
+  GRAPH_ALLOW_PLAINTEXT: "true"
+
+  # Reverse-dependency closure over an ecosystem graph scans far more edges than
+  # the shipped default allows, and a query that trips a budget returns fewer
+  # rows rather than an error.
+  GRAPH_MAX_QUERY_SCAN_EDGES: "50000000"
+  GRAPH_MAX_QUERY_RUNTIME_MS: "60000"
+
+  # OpenCypher async futures overflow the default thread stack; without this the
+  # node serves /readyz and then aborts on the first query.
+  RUST_MIN_STACK: "33554432"
+  RUST_LOG: info
+
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    # Limits throughout, because the whole stack shares a laptop with the
+    # ingest process. An unbounded container here starves the thing feeding it.
+    # They are ceilings, not targets: a container held at its ceiling spends its
+    # time reclaiming instead of working, which during ingest looks exactly like
+    # the database having gone away.
+    mem_limit: 1g
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-firestop}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-firestop-dev-secret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  create-bucket:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-firestop}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-firestop-dev-secret}
+      HYDRADB_BUCKET: ${HYDRADB_BUCKET:-firestop}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
+        mc mb --ignore-existing "local/$$HYDRADB_BUCKET"
+
+  # The auth token has to be a file of at least 32 characters, and the cache
+  # directory has to be writable by the image's UID 10001.
+  local-state:
+    image: alpine:3.20
+    volumes:
+      - hydra-local:/var/lib/hydradb
+    environment:
+      HYDRADB_AUTH_TOKEN: ${HYDRADB_AUTH_TOKEN:?set HYDRADB_AUTH_TOKEN in .env}
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        mkdir -p /var/lib/hydradb/cache
+        printf '%s\n' "$$HYDRADB_AUTH_TOKEN" > /var/lib/hydradb/auth-token
+        chown -R 10001:10001 /var/lib/hydradb
+
+  graph-node:
+    image: ghcr.io/hydra-db/hydradb:0.1.1
+    depends_on:
+      create-bucket:
+        condition: service_completed_successfully
+      local-state:
+        condition: service_completed_successfully
+    environment:
+      <<: *hydra-env
+      GRAPH_NODE_ID: node-0
+      GRAPH_BOLT_ADDR: 0.0.0.0:7687
+      GRAPH_ADVERTISED_BOLT_ADDR: 127.0.0.1:7687
+      GRAPH_BOLT_NODE_ADDRESSES: node-0=127.0.0.1:7687
+      GRAPH_HTTP_ADDR: 0.0.0.0:8443
+      GRAPH_ADMIN_ADDR: 0.0.0.0:9090
+    mem_limit: 6g
+    ports:
+      - "7687:7687"
+      - "8443:8443"
+      - "9090:9090"
+    volumes:
+      - hydra-local:/var/lib/hydradb
+
+  # Builds immutable CSC traversal generations in the background and publishes
+  # them by compare-and-swap. Reads stay correct without it, but multi-hop
+  # traversal falls back to canonical adjacency and gets materially slower.
+  graph-indexer:
+    image: ghcr.io/hydra-db/hydradb:0.1.1
+    entrypoint: ["/usr/local/bin/graph-indexer"]
+    depends_on:
+      create-bucket:
+        condition: service_completed_successfully
+      local-state:
+        condition: service_completed_successfully
+    environment:
+      <<: *hydra-env
+      GRAPH_NODE_ID: indexer-0
+      GRAPH_INDEXER_ADMIN_ADDR: 0.0.0.0:9091
+    mem_limit: 2g
+    ports:
+      - "9091:9091"
+    volumes:
+      - hydra-local:/var/lib/hydradb
+
+volumes:
+  minio-data:
+  hydra-local:
