@@ -1,0 +1,14 @@
+{
+  "name": "@acme/admin-console",
+  "version": "0.14.2",
+  "private": true,
+  "description": "Internal operations console.",
+  "dependencies": {
+    "ejs": "3.1.6",
+    "express": "4.17.1",
+    "minimist": "1.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.15"
+  }
+}

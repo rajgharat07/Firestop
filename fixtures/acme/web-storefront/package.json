@@ -1,0 +1,16 @@
+{
+  "name": "@acme/web-storefront",
+  "version": "8.2.0",
+  "private": true,
+  "description": "Customer-facing storefront.",
+  "dependencies": {
+    "axios": "0.21.1",
+    "lodash": "4.17.20",
+    "moment": "2.29.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "webpack": "5.68.0"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@acme/batch-jobs",
+  "version": "1.9.3",
+  "private": true,
+  "description": "Nightly reconciliation and export jobs.",
+  "dependencies": {
+    "lodash": "4.17.20",
+    "minimist": "1.2.5",
+    "node-fetch": "2.6.6",
+    "semver": "7.3.5"
+  }
+}
