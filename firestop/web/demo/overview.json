@@ -1,0 +1,54 @@
+{
+  "services": [
+    {
+      "name": "checkout-api",
+      "criticality": "tier-1",
+      "repo": "github.com/acme/checkout-api"
+    },
+    {
+      "name": "web-storefront",
+      "criticality": "tier-1",
+      "repo": "github.com/acme/web-storefront"
+    },
+    {
+      "name": "batch-jobs",
+      "criticality": "tier-2",
+      "repo": "github.com/acme/batch-jobs"
+    },
+    {
+      "name": "admin-console",
+      "criticality": "tier-3",
+      "repo": "github.com/acme/admin-console"
+    }
+  ],
+  "packages": [
+    { "name": "lodash", "dependents": 412 },
+    { "name": "minimist", "dependents": 287 },
+    { "name": "express", "dependents": 198 },
+    { "name": "axios", "dependents": 164 },
+    { "name": "semver", "dependents": 141 },
+    { "name": "moment", "dependents": 96 },
+    { "name": "react", "dependents": 74 },
+    { "name": "debug", "dependents": 68 }
+  ],
+  "advisories": [
+    {
+      "osv_id": "GHSA-35jh-r3h4-6jhm",
+      "summary": "Command Injection in lodash",
+      "severity": "high",
+      "published_at": 1613347200
+    },
+    {
+      "osv_id": "GHSA-p6mc-m468-83gw",
+      "summary": "Prototype Pollution in lodash",
+      "severity": "high",
+      "published_at": 1561420800
+    },
+    {
+      "osv_id": "GHSA-xvch-5gv4-984h",
+      "summary": "Prototype Pollution in minimist",
+      "severity": "medium",
+      "published_at": 1614556800
+    }
+  ]
+}

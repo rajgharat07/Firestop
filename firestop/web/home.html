@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firestop — Seal the blast radius</title>
+    <meta
+      name="description"
+      content="Firestop maps the blast radius of a compromised npm package across your services, then computes the fewest dependency bumps that seal it."
+    />
+    <link rel="stylesheet" href="/static/theme.css" />
+    <link rel="stylesheet" href="/static/pages.css" />
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="site-nav"></div>
+
+    <div class="site-main">
+      <section class="hero">
+        <div class="hero-inner">
+          <p class="hero-kicker"><span class="ember-bar"></span> Supply chain blast radius</p>
+          <h1>Map the blast radius. Seal every path.</h1>
+          <p class="lede">
+            Firestop maps every path from your services to a compromised npm
+            package, then computes the smallest set of dependency bumps that
+            cut them all — on HydraDB, with one
+            <span class="mono">algo.MSpaths</span> call.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/console">Open the console</a>
+            <a class="btn btn-ghost" href="/how-it-works">See how it works</a>
+          </div>
+
+          <div id="home-error" class="banner error" hidden></div>
+
+          <div class="stat-grid home-stats reveal" id="home-stats">
+            <div class="stat">
+              <b class="stat-value skeleton" id="stat-packages">—</b>
+              <span class="stat-label">Packages</span>
+            </div>
+            <div class="stat">
+              <b class="stat-value skeleton" id="stat-releases">—</b>
+              <span class="stat-label">Releases</span>
+            </div>
+            <div class="stat">
+              <b class="stat-value skeleton" id="stat-advisories">—</b>
+              <span class="stat-label">Advisories</span>
+            </div>
+            <div class="stat">
+              <b class="stat-value skeleton" id="stat-services">—</b>
+              <span class="stat-label">Services</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-wrap">
+        <section class="page-section reveal">
+          <p class="section-label">How it seals</p>
+          <h2 class="section-title">From compromise to fix in five beats</h2>
+          <p class="section-lead">
+            Live npm + OSV data, fixture lockfiles for a demo org, and a
+            chokepoint planner that answers with concrete bumps — not a count.
+          </p>
+
+          <div class="teaser-grid">
+            <article class="teaser-step">
+              <span class="idx">01</span>
+              <h3>Compromise</h3>
+              <p>Name an advisory or a package + semver range.</p>
+            </article>
+            <article class="teaser-step">
+              <span class="idx">02</span>
+              <h3>Blast radius</h3>
+              <p>Every service that can reach an affected release.</p>
+            </article>
+            <article class="teaser-step">
+              <span class="idx">03</span>
+              <h3>Paths</h3>
+              <p>Concrete hops through lockfiles and DEPENDS_ON edges.</p>
+            </article>
+            <article class="teaser-step">
+              <span class="idx">04</span>
+              <h3>Seal</h3>
+              <p>Fewest bumps that cut every live path.</p>
+            </article>
+            <article class="teaser-step">
+              <span class="idx">05</span>
+              <h3>As-of</h3>
+              <p>Temporal windows — who resolved the bad version when it was live.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="cta-band reveal">
+          <div>
+            <h2>Try the lodash demo</h2>
+            <p>
+              Package <span class="mono">lodash</span>, versions
+              <span class="mono">&lt;4.17.21</span> — three services, three
+              lockfile formats, Seal to 4.17.21.
+            </p>
+          </div>
+          <a class="btn btn-primary" href="/console">Launch console</a>
+        </section>
+      </div>
+    </div>
+
+    <div id="site-footer"></div>
+
+    <script type="module">
+      import { loadGraphStats, hydraHint } from "/static/layout.js";
+
+      const error = document.getElementById("home-error");
+      const values = [
+        document.getElementById("stat-packages"),
+        document.getElementById("stat-releases"),
+        document.getElementById("stat-advisories"),
+        document.getElementById("stat-services"),
+      ];
+
+      try {
+        await loadGraphStats({
+          packages: document.getElementById("stat-packages"),
+          releases: document.getElementById("stat-releases"),
+          advisories: document.getElementById("stat-advisories"),
+          services: document.getElementById("stat-services"),
+        });
+        values.forEach((node) => node.classList.remove("skeleton"));
+      } catch (err) {
+        values.forEach((node) => {
+          node.classList.remove("skeleton");
+          node.textContent = "—";
+        });
+        error.hidden = false;
+        error.textContent = hydraHint(err);
+      }
+    </script>
+  </body>
+</html>

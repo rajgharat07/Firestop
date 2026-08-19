@@ -1,0 +1,93 @@
+{
+  "compromise": {
+    "advisory": "",
+    "summary": "",
+    "severity": "",
+    "packages": ["lodash"],
+    "releases": ["lodash@4.17.20"],
+    "fixed_in": ["4.17.21"],
+    "introduced_at": 1607558400
+  },
+  "as_of": null,
+  "services": [
+    {
+      "service": "checkout-api",
+      "criticality": "tier-1",
+      "shortest": 2,
+      "runtime": true,
+      "direct": true,
+      "targets": ["lodash@4.17.20"],
+      "paths": [
+        {
+          "target": "lodash@4.17.20",
+          "entry": "lodash@4.17.20",
+          "hops": 2,
+          "chain": [
+            "checkout-api",
+            "checkout-api/package-lock.json",
+            "lodash@4.17.20"
+          ],
+          "build_time": false,
+          "direct": true,
+          "valid_from": 1646125920,
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "service": "web-storefront",
+      "criticality": "tier-1",
+      "shortest": 2,
+      "runtime": true,
+      "direct": true,
+      "targets": ["lodash@4.17.20"],
+      "paths": [
+        {
+          "target": "lodash@4.17.20",
+          "entry": "lodash@4.17.20",
+          "hops": 2,
+          "chain": [
+            "web-storefront",
+            "web-storefront/yarn.lock",
+            "lodash@4.17.20"
+          ],
+          "build_time": false,
+          "direct": true,
+          "valid_from": 1644856800,
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "service": "batch-jobs",
+      "criticality": "tier-2",
+      "shortest": 2,
+      "runtime": true,
+      "direct": true,
+      "targets": ["lodash@4.17.20"],
+      "paths": [
+        {
+          "target": "lodash@4.17.20",
+          "entry": "lodash@4.17.20",
+          "hops": 2,
+          "chain": [
+            "batch-jobs",
+            "batch-jobs/pnpm-lock.yaml",
+            "lodash@4.17.20"
+          ],
+          "build_time": false,
+          "direct": true,
+          "valid_from": 1642676700,
+          "valid_to": null
+        }
+      ]
+    }
+  ],
+  "exposed": 3,
+  "paths_returned": 3,
+  "paths_live": 3,
+  "truncated": false,
+  "depth": 8,
+  "shortened": false,
+  "elapsed_ms": 38.4
+}

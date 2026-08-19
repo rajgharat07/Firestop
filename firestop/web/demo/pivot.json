@@ -1,0 +1,16 @@
+{
+  "package": "lodash",
+  "maintainers": ["jdalton", "bnjmnt4n", "mathias"],
+  "siblings": [
+    { "package": "lodash-es", "dependents": 88, "maintainers": ["jdalton"] },
+    { "package": "lodash.debounce", "dependents": 41, "maintainers": ["jdalton"] },
+    { "package": "lodash.throttle", "dependents": 29, "maintainers": ["jdalton"] },
+    { "package": "lodash.merge", "dependents": 24, "maintainers": ["jdalton"] },
+    { "package": "lodash.get", "dependents": 18, "maintainers": ["jdalton"] },
+    { "package": "lodash.isequal", "dependents": 14, "maintainers": ["jdalton"] },
+    { "package": "lodash.clonedeep", "dependents": 11, "maintainers": ["jdalton"] },
+    { "package": "lodash.template", "dependents": 7, "maintainers": ["jdalton", "mathias"] }
+  ],
+  "reach": 8,
+  "dependents": 232
+}

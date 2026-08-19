@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firestop — Features</title>
+    <link rel="stylesheet" href="/static/theme.css" />
+    <link rel="stylesheet" href="/static/pages.css" />
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="site-nav"></div>
+
+    <div class="site-main">
+      <div class="page-wrap">
+        <header class="page-section reveal">
+          <p class="section-label">What we built</p>
+          <h1 class="section-title">Every capability, nowhere hidden.</h1>
+          <p class="section-lead">
+            The console wires blast + Seal (+ a pivot strip). CLI and the
+            read-only API expose the full surface — including reach, typosquat
+            radar, and the eval harness.
+          </p>
+        </header>
+
+        <section class="feature-grid page-section">
+          <article class="card feature-card reveal">
+            <span class="badge surface">UI · CLI · API</span>
+            <h3>Blast radius</h3>
+            <p>
+              Map every service that can reach a compromised release. Returns
+              exposed services, hop counts, and concrete path chains through
+              lockfiles.
+            </p>
+            <p class="hint"><span class="mono">GET /api/blast</span> · <span class="mono">firestop blast</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">UI · CLI · API</span>
+            <h3>Seal / chokepoint</h3>
+            <p>
+              Compute the fewest dependency bumps that cut every live path,
+              prefer pins you own, and verify upgrades do not still reach the
+              compromise.
+            </p>
+            <p class="hint"><span class="mono">GET /api/fix</span> · <span class="mono">firestop fix</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">UI · CLI · API</span>
+            <h3>Maintainer pivot</h3>
+            <p>
+              From a compromised package, list maintainers who can publish and
+              the sibling packages they can also ship in this graph.
+            </p>
+            <p class="hint"><span class="mono">GET /api/pivot</span> · <span class="mono">firestop pivot</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">CLI · API</span>
+            <h3>Typosquat radar</h3>
+            <p>
+              Edit-distance candidates against popular names, filtered by
+              publisher overlap and dependent noise so the signal stays usable.
+            </p>
+            <p class="hint"><span class="mono">GET /api/typosquat</span> · <span class="mono">firestop typosquat</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">CLI · API</span>
+            <h3>Ecosystem reach</h3>
+            <p>
+              Reverse traversal from a bad release across the ecosystem —
+              ignoring your services — to see how far a compromise can spread.
+            </p>
+            <p class="hint"><span class="mono">GET /api/reach</span> · <span class="mono">firestop reach</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">CLI</span>
+            <h3>Eval harness</h3>
+            <p>
+              Agreement vs per-service MSpaths, plus a name-similarity ablation
+              that is supposed to look weak. Grounds the claim that paths beat
+              string matching.
+            </p>
+            <p class="hint"><span class="mono">firestop evaluate</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">CLI</span>
+            <h3>npm crawl + OSV</h3>
+            <p>
+              Resumable registry crawl with temporal DEPENDS_ON windows, plus
+              OSV npm bulk ingest into AFFECTS edges on crawled releases.
+            </p>
+            <p class="hint"><span class="mono">firestop crawl</span> · <span class="mono">firestop advisories</span></p>
+          </article>
+
+          <article class="card feature-card reveal">
+            <span class="badge surface">CLI</span>
+            <h3>Lockfile ingest</h3>
+            <p>
+              npm, yarn, and pnpm parsers against a fixture org so demos show
+              three formats without requiring a GitHub token.
+            </p>
+            <p class="hint"><span class="mono">firestop lockfiles</span></p>
+          </article>
+        </section>
+
+        <section class="cta-band reveal">
+          <div>
+            <h2>Use it in the browser</h2>
+            <p>Blast and Seal are one click away. Pivot appears after a successful run.</p>
+          </div>
+          <a class="btn btn-primary" href="/console">Open console</a>
+        </section>
+      </div>
+    </div>
+
+    <div id="site-footer"></div>
+    <script type="module" src="/static/layout.js"></script>
+  </body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firestop — Console</title>
+    <link rel="stylesheet" href="/static/theme.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="site-nav"></div>
+
+    <div class="site-main">
+      <header class="console-header">
+        <div class="brand-copy">
+          <h1>Console</h1>
+          <p>Blast radius and chokepoint analysis for supply chain compromises</p>
+        </div>
+        <div class="graph-stats" id="graph-stats"></div>
+      </header>
+
+      <div id="hydra-banner" hidden></div>
+
+      <main class="console-main">
+        <aside class="panel incident" id="compose">
+          <h2 class="section-label">Incident</h2>
+          <p class="panel-hint">
+            Every service against every affected release in one
+            <span class="mono">algo.MSpaths</span> call.
+          </p>
+
+          <div class="field">
+            <label for="advisory">Advisory</label>
+            <input
+              id="advisory"
+              list="advisories"
+              placeholder="GHSA-… or CVE-…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <datalist id="advisories"></datalist>
+          </div>
+
+          <p class="or">or</p>
+
+          <div class="field pair">
+            <div>
+              <label for="package">Package</label>
+              <input
+                id="package"
+                list="packages"
+                placeholder="lodash"
+                value="lodash"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <datalist id="packages"></datalist>
+            </div>
+            <div>
+              <label for="versions">Versions</label>
+              <input
+                id="versions"
+                placeholder="&lt;4.17.21"
+                value="&lt;4.17.21"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="asof">
+              As of <span id="asof-label">now</span>
+            </label>
+            <input id="asof" type="range" min="0" max="100" value="100" />
+            <div class="scrub-ends">
+              <span id="asof-start">2020-01-01</span>
+              <span>now</span>
+            </div>
+          </div>
+
+          <label class="check">
+            <input id="build" type="checkbox" checked />
+            Include build-time exposure
+          </label>
+
+          <button id="run" class="primary" type="button">Compute blast radius</button>
+          <p id="status" class="status"></p>
+        </aside>
+
+        <section class="results">
+          <div class="card summary" id="summary">
+            <p class="empty">
+              Name a compromised package or advisory, then compute. Paths and
+              remediation appear here.
+            </p>
+          </div>
+          <div id="stage-blast"></div>
+          <div id="stage-paths"></div>
+          <div id="stage-seal"></div>
+          <div id="stage-pivot"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="site-footer"></div>
+
+    <script type="module" src="/static/layout.js"></script>
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>

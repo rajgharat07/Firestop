@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firestop — Architecture</title>
+    <link rel="stylesheet" href="/static/theme.css" />
+    <link rel="stylesheet" href="/static/pages.css" />
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="site-nav"></div>
+
+    <div class="site-main">
+      <div class="page-wrap">
+        <header class="page-section reveal">
+          <p class="section-label">Architecture</p>
+          <h1 class="section-title">One graph. Four planes. Object-store native.</h1>
+          <p class="section-lead">
+            Firestop is a Python client + FastAPI UI over HydraDB. Hydra runs as
+            a separate AGPL service — we never vendor its source. Durable state
+            lives in MinIO; the indexer keeps multi-hop traversals fast.
+          </p>
+        </header>
+
+        <section class="page-section reveal">
+          <p class="section-label">Topology</p>
+          <h2 class="section-title">MinIO · graph-node · indexer</h2>
+          <div class="topo">
+            <article class="card topo-node">
+              <strong>MinIO</strong>
+              <span>S3-compatible store<br />ports 9000 / 9001</span>
+            </article>
+            <article class="card topo-node">
+              <strong>graph-node</strong>
+              <span>OpenCypher HTTP + Bolt<br />HTTP 8443 · Bolt 7687</span>
+            </article>
+            <article class="card topo-node">
+              <strong>graph-indexer</strong>
+              <span>Immutable CSC generations<br />admin 9091</span>
+            </article>
+          </div>
+          <p class="pipeline-caption" style="margin-top: 16px">
+            Writes go over HTTP batched UNWIND. Bolt is used as a connectivity
+            check in <span class="mono">firestop doctor</span>.
+          </p>
+        </section>
+
+        <section class="page-section reveal">
+          <p class="section-label">Graph model</p>
+          <h2 class="section-title">Vertices and edges</h2>
+          <div class="schema-grid">
+            <article class="card">
+              <h3 class="section-label">Vertices</h3>
+              <ul class="schema-list">
+                <li><span>Package</span><span class="kind">npm name</span></li>
+                <li><span>Release</span><span class="kind">name@version</span></li>
+                <li><span>Maintainer</span><span class="kind">publisher</span></li>
+                <li><span>Service</span><span class="kind">demo org</span></li>
+                <li><span>Lockfile</span><span class="kind">npm/yarn/pnpm</span></li>
+                <li><span>Advisory</span><span class="kind">OSV / GHSA</span></li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3 class="section-label">Edges</h3>
+              <ul class="schema-list">
+                <li><span>VERSION_OF</span><span class="kind">release → package</span></li>
+                <li><span>DEPENDS_ON</span><span class="kind">runtime · temporal</span></li>
+                <li><span>DEV_DEPENDS_ON</span><span class="kind">build-time</span></li>
+                <li><span>USES_LOCKFILE / PINS</span><span class="kind">service → pin</span></li>
+                <li><span>AFFECTS</span><span class="kind">advisory → release</span></li>
+                <li><span>CAN_PUBLISH / PUBLISHED</span><span class="kind">maintainer</span></li>
+              </ul>
+            </article>
+          </div>
+          <p class="pipeline-caption" style="margin-top: 16px">
+            Runtime vs build-time is two relationship types, not a property —
+            path procedures cannot filter on rel properties. As-of filtering is
+            applied client-side after paths return.
+          </p>
+        </section>
+
+        <section class="page-section reveal">
+          <p class="section-label">API surface</p>
+          <h2 class="section-title">Read-only GETs</h2>
+          <p class="section-lead">
+            Ingest stays in the CLI. The HTTP API never writes, so a hosted demo
+            can be handed out without write access.
+          </p>
+          <div class="card">
+            <table class="api-table">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Path</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/health</td>
+                  <td>Ready + vertex census</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/overview</td>
+                  <td>Services, top packages, advisories</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/blast</td>
+                  <td>Exposure / blast radius</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/fix</td>
+                  <td>Chokepoint remediation plan</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/reach</td>
+                  <td>Ecosystem reach</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/pivot</td>
+                  <td>Maintainer pivot</td>
+                </tr>
+                <tr>
+                  <td class="method">GET</td>
+                  <td class="path">/api/typosquat</td>
+                  <td>Typosquat radar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="pipeline-caption" style="margin-top: 16px">
+            Interactive OpenAPI docs live at <a href="/docs">/docs</a>.
+          </p>
+        </section>
+
+        <section class="cta-band reveal">
+          <div>
+            <h2>Clone, compose, serve</h2>
+            <p>
+              <span class="mono">docker compose up -d</span> then
+              <span class="mono">python -m firestop serve</span> — no frontend build step.
+            </p>
+          </div>
+          <a class="btn btn-primary" href="/console">Open console</a>
+        </section>
+      </div>
+    </div>
+
+    <div id="site-footer"></div>
+    <script type="module" src="/static/layout.js"></script>
+  </body>
+</html>

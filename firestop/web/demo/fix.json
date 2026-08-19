@@ -1,0 +1,42 @@
+{
+  "changes": [
+    {
+      "description": "unpin lodash@4.17.20 in checkout-api/package-lock.json",
+      "holder": "checkout-api/package-lock.json",
+      "package": "lodash",
+      "from_version": "4.17.20",
+      "to_version": "4.17.21",
+      "severs": 1,
+      "mine": true,
+      "blocked": false
+    },
+    {
+      "description": "unpin lodash@4.17.20 in web-storefront/yarn.lock",
+      "holder": "web-storefront/yarn.lock",
+      "package": "lodash",
+      "from_version": "4.17.20",
+      "to_version": "4.17.21",
+      "severs": 1,
+      "mine": true,
+      "blocked": false
+    },
+    {
+      "description": "unpin lodash@4.17.20 in batch-jobs/pnpm-lock.yaml",
+      "holder": "batch-jobs/pnpm-lock.yaml",
+      "package": "lodash",
+      "from_version": "4.17.20",
+      "to_version": "4.17.21",
+      "severs": 1,
+      "mine": true,
+      "blocked": false
+    }
+  ],
+  "paths": 3,
+  "severed": 3,
+  "naive": 3,
+  "saved": 0,
+  "complete": true,
+  "followable": true,
+  "exact": true,
+  "rounds": 1
+}

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firestop — How it works</title>
+    <link rel="stylesheet" href="/static/theme.css" />
+    <link rel="stylesheet" href="/static/pages.css" />
+    <link rel="icon" href="/static/mark.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="site-nav"></div>
+
+    <div class="site-main">
+      <div class="page-wrap">
+        <header class="page-section reveal">
+          <p class="section-label">How it works</p>
+          <h1 class="section-title">Compromise in. Paths out. Seal the rest.</h1>
+          <p class="section-lead">
+            Firestop is not “N packages affected.” It answers with concrete
+            exposure paths and the fewest dependency bumps that cut every one
+            of them — resolved as of a moment in time.
+          </p>
+        </header>
+
+        <section class="page-section reveal">
+          <div class="pipeline" id="pipeline">
+            <svg viewBox="0 0 900 140" role="img" aria-label="Firestop analysis pipeline">
+              <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#8b949e" />
+                </marker>
+              </defs>
+              <path class="edge" id="e1" d="M150 70 H210" marker-end="url(#arrow)" />
+              <path class="edge" id="e2" d="M320 70 H380" marker-end="url(#arrow)" />
+              <path class="edge" id="e3" d="M490 70 H550" marker-end="url(#arrow)" />
+              <path class="edge" id="e4" d="M660 70 H720" marker-end="url(#arrow)" />
+
+              <g data-step="0">
+                <rect class="node-box" x="20" y="40" width="130" height="60" rx="8" />
+                <text class="node-label" x="85" y="75" text-anchor="middle">Compromise</text>
+              </g>
+              <g data-step="1">
+                <rect class="node-box" x="210" y="40" width="110" height="60" rx="8" />
+                <text class="node-label" x="265" y="75" text-anchor="middle">Blast</text>
+              </g>
+              <g data-step="2">
+                <rect class="node-box" x="380" y="40" width="110" height="60" rx="8" />
+                <text class="node-label" x="435" y="75" text-anchor="middle">Paths</text>
+              </g>
+              <g data-step="3">
+                <rect class="node-box" x="550" y="40" width="110" height="60" rx="8" />
+                <text class="node-label" x="605" y="75" text-anchor="middle">Seal</text>
+              </g>
+              <g data-step="4">
+                <rect class="node-box" x="720" y="40" width="160" height="60" rx="8" />
+                <text class="node-label" x="800" y="75" text-anchor="middle">Temporal as-of</text>
+              </g>
+            </svg>
+          </div>
+          <p class="pipeline-caption">Scroll the steps — the pipeline highlights as you go.</p>
+        </section>
+
+        <section class="page-section">
+          <div class="step-rail">
+            <article class="step-row reveal" data-pipeline="0">
+              <div class="step-num">01</div>
+              <div>
+                <h3>Name the compromise</h3>
+                <p>
+                  An OSV / GHSA advisory, or a package plus a semver range.
+                  Firestop expands that into the set of affected
+                  <span class="mono">Release.key</span> values already in the graph.
+                </p>
+              </div>
+            </article>
+            <article class="step-row reveal" data-pipeline="1">
+              <div class="step-num">02</div>
+              <div>
+                <h3>Compute blast radius</h3>
+                <p>
+                  One multi-source call asks: every service → every compromised
+                  release. That is HydraDB’s <code class="mono">algo.MSpaths</code> —
+                  not a hand-rolled BFS that times out on a real graph.
+                </p>
+              </div>
+            </article>
+            <article class="step-row reveal" data-pipeline="2">
+              <div class="step-num">03</div>
+              <div>
+                <h3>Show the paths</h3>
+                <p>
+                  Each chain crosses lockfile, pin, and dependency edges —
+                  npm, yarn, and pnpm alike — so you see <em>how</em> the bad
+                  release gets in, not just that something is exposed.
+                </p>
+              </div>
+            </article>
+            <article class="step-row reveal" data-pipeline="3">
+              <div class="step-num">04</div>
+              <div>
+                <h3>Seal the chokepoints</h3>
+                <p>
+                  A min hitting-set over path hops picks the fewest bumps that
+                  cut every live path, then verifies upgrades still do not
+                  reach the compromise.
+                </p>
+              </div>
+            </article>
+            <article class="step-row reveal" data-pipeline="4">
+              <div class="step-num">05</div>
+              <div>
+                <h3>Scrub time</h3>
+                <p>
+                  <code class="mono">DEPENDS_ON</code> edges carry
+                  <code class="mono">valid_from</code> /
+                  <code class="mono">valid_to</code> windows. As-of filtering
+                  answers who resolved the bad version while it was live.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page-section reveal">
+          <p class="section-label">Under the hood</p>
+          <h2 class="section-title">Why HydraDB is the product</h2>
+          <div class="detail-grid">
+            <article class="card detail-card">
+              <h3>algo.MSpaths</h3>
+              <p>
+                Multi-source, multi-target path enumeration in one procedure.
+                Config is inline literals; selectors are string lists on
+                <code>key</code> / <code>name</code>. Hub packages negotiate
+                depth down when the frontier would exhaust the node.
+              </p>
+            </article>
+            <article class="card detail-card">
+              <h3>Temporal DEPENDS_ON</h3>
+              <p>
+                Ranges like <code>^1.2.0</code> resolve differently by install
+                time. Firestop stores validity windows and filters client-side
+                after paths return — procedures cannot predicate on edge
+                properties.
+              </p>
+            </article>
+            <article class="card detail-card">
+              <h3>MinIO + indexer</h3>
+              <p>
+                Durable graph state lives in object storage. The indexer builds
+                immutable CSC generations so multi-hop stays fast. Local
+                filesystem backends cannot CAS the indexer cursor — MinIO is
+                required.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="cta-band reveal">
+          <div>
+            <h2>Run it live</h2>
+            <p>The console is wired to real Hydra queries on this graph.</p>
+          </div>
+          <a class="btn btn-primary" href="/console">Open console</a>
+        </section>
+      </div>
+    </div>
+
+    <div id="site-footer"></div>
+
+    <script type="module">
+      import "/static/layout.js";
+
+      const steps = document.querySelectorAll("[data-pipeline]");
+      const boxes = document.querySelectorAll("#pipeline [data-step]");
+      const edges = ["e1", "e2", "e3", "e4"].map((id) => document.getElementById(id));
+
+      function paint(active) {
+        boxes.forEach((group) => {
+          const box = group.querySelector(".node-box");
+          const on = Number(group.dataset.step) <= active;
+          box.classList.toggle("active", on);
+        });
+        edges.forEach((edge, index) => {
+          if (edge) edge.classList.toggle("active", index < active);
+        });
+      }
+
+      paint(0);
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .map((entry) => Number(entry.target.dataset.pipeline));
+            if (visible.length) paint(Math.max(...visible));
+          },
+          { threshold: 0.55 }
+        );
+        steps.forEach((step) => observer.observe(step));
+      }
+    </script>
+  </body>
+</html>

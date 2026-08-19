@@ -1,0 +1,13 @@
+{
+  "ready": true,
+  "read_epoch": 12,
+  "vertices": {
+    "Package": 1500,
+    "Release": 43218,
+    "Advisory": 1847,
+    "Service": 4,
+    "Lockfile": 4,
+    "Maintainer": 892
+  },
+  "errors": []
+}
