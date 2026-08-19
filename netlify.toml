@@ -1,0 +1,23 @@
+[build]
+  command = "python scripts/build_static_demo.py"
+  publish = "dist"
+
+[[redirects]]
+  from = "/console"
+  to = "/console.html"
+  status = 200
+
+[[redirects]]
+  from = "/how-it-works"
+  to = "/how-it-works.html"
+  status = 200
+
+[[redirects]]
+  from = "/features"
+  to = "/features.html"
+  status = 200
+
+[[redirects]]
+  from = "/architecture"
+  to = "/architecture.html"
+  status = 200
