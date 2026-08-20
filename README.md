@@ -86,6 +86,14 @@ python -m firestop doctor
 
 > MinIO is deliberate: the indexer advances its scope cursor with a conditional put. HydraDB’s local-filesystem object-store backend does not implement that, so without MinIO the node serves queries but never publishes a traversal index. Firestop’s queries are multi-hop — compiled CSC generations are not optional.
 
+### Running on macOS
+
+Nothing special — the same clone-and-run flow works end to end:
+
+- Install **Docker Desktop for Apple Silicon**.
+- The `.env` compose token and `docker compose up -d` flow are identical to every other OS; use the `source .venv/bin/activate` activation line from the block above.
+- The crawl runs alongside the containers, so give Docker a comfortable CPU/memory allocation for a smooth run (see the note under [Populate the demo graph](#populate-the-demo-graph)).
+
 ### Populate the demo graph
 
 ```bash
@@ -98,7 +106,7 @@ python -m firestop advisories --data-dir data
 python -m firestop lockfiles --org fixtures/acme
 ```
 
-The crawl runs alongside the containers, so give Docker enough memory (the compose file already caps each container). If a crawl is killed, give Docker more memory and re-run — it resumes from its checkpoint.
+The crawl runs alongside the containers, so give Docker Desktop a generous CPU and memory allocation for a faster crawl — bump both up under **Settings → Resources**. The compose file already caps each container, and the crawl checkpoints as it goes, so it resumes cleanly if you pause it or re-run.
 
 ### Open the UI
 
